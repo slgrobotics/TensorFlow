@@ -1,9 +1,3 @@
-
-# coding: utf-8
-
-# In[1]:
-
-
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.callbacks import TensorBoard
@@ -12,6 +6,7 @@ from time import time
 from datetime import datetime
 from PIL import Image, ImageDraw
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 import random
 
@@ -346,10 +341,12 @@ def plot_value_array(i, predictions_array, true_label):
 num_rows = 50
 num_cols = 4
 num_images = num_rows*num_cols
-plt.figure(figsize=(2*2*num_cols, 2*num_rows))
+fig=plt.figure(figsize=(2 * 2 * num_cols, 2 * num_rows))
 for i in range(num_images):
   plt.subplot(num_rows, 2*num_cols, 2*i+1)
   plot_image(i, predictions, test_labels, test_images)
   plt.subplot(num_rows, 2*num_cols, 2*i+2)
   plot_value_array(i, predictions, test_labels)
 
+#plt.show()
+fig.savefig('plt-out.png',bbox_inches='tight')
