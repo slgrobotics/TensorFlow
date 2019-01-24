@@ -43,12 +43,11 @@ types = ["image_array", "float", "float", "str"]  # ['float', 'image']
 
 # This is called from the VideoClip as it references a time.
 def make_frame(t):
-    frame_rec = get_recorded_frame(t)
-    image = frame_rec[0]
+    image, angle, throttle, mode = get_recorded_frame(t)
     # print(image[:20])
     # print(image.shape)  # (120, 160, 3)
-    # print('angle=', frame_rec[1], 'throttle=', frame_rec[2], 'mode=', frame_rec[3])
-    return image  # returns None or a 8-bit RGB array required by mpy.VideoClip()
+    # print('angle=', angle, 'throttle=', throttle, 'mode=', mode)
+    return image  # returns None or a 8-bit RGB array (120, 160, 3) required by mpy.VideoClip()
 
 
 tub = Tub(path=path, inputs=inputs, types=types)
