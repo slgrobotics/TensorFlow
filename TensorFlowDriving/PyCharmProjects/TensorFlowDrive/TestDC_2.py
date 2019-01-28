@@ -6,13 +6,13 @@ import argparse
 
 import numpy as np
 import cv2
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 import moviepy.editor as mpy
 
 from libDonkeyCar.datastore import Tub
 
-path = 'C:\\Projects\\Robotics\\DonkeyCar\\DonkeySimWindows\\log'   # Sim or actual drive log location
+path = 'C:\\Projects\\Robotics\\DonkeyCar\\DonkeySimWindows\\log'  # Sim or actual drive log location
 DRIVE_LOOP_HZ = 10
 out = 'movie.mp4'
 
@@ -44,34 +44,26 @@ def get_recorded_frame(t):
     return image, angle, throttle, mode  # returns a tuple
 
 
-# converts image to a (size_th x size_th) numpy array, suitable for TensorFlow input
-def to_image_arr(img):
-    img = img.convert("RGB")
-    # img.show()
-    img_arr = np.asarray(img, dtype=np.float32) / 255
-    img_arr = img_arr[:, :, :1]
-    # img_arr = img_arr.reshape((size_th, size_th))
-    # img_arr.shape
-
-    # img_arr = np.zeros(shape=(size_th, size_th), dtype=np.float32)
-    return img_arr
-
-
 def mark_image(image, angle, throttle, mode):
     # make a frame with markings to show on video:
-    shape = image.shape
-
-    video_img = Image.fromarray(np.uint8(image))
+    video_img = Image.fromarray(image)
     pdraw = ImageDraw.Draw(video_img)
 
-    line_width = 10  # of the elements in the large image
+    img_width = image.shape[1]
+    img_height = image.shape[0]
+
+    line_width = 5  # of the elements in the large image
     color_fg = (0, 127, 0)
 
-    pdraw.line((10, 10, 80, 80), fill=color_fg, width=line_width)
+    pdraw.text((15, 10), "{:.3f}".format(angle), font=ImageFont.truetype("arial", 16))
+    pdraw.text((img_width - 60, 10), "{:.3f}".format(throttle), font=ImageFont.truetype("arial", 16))
 
-    video_img_arr = to_image_arr(video_img)  # to a numpy array
+    x = 10 if angle < 0 else img_width - 10
+    if angle == 0:
+        x = img_width / 2
+    pdraw.line((x, 10, img_width / 2, img_height - 10), fill=color_fg, width=line_width)
 
-    return np.stack([video_img_arr,video_img_arr,video_img_arr], axis=2).reshape((shape[0], shape[1], 3))
+    return np.asarray(video_img, dtype=np.float32)
 
 
 # This is called from the VideoClip as it references a time.
@@ -81,18 +73,20 @@ def make_frame(t):
     # print(image.shape)  # (120, 160, 3)
     # print('angle=', angle, 'throttle=', throttle, 'mode=', mode)
 
-    video_img_arr = mark_image(image, angle, throttle, mode)
-    # print(video_img_arr[:20])
-    # print(video_img_arr.shape)  # (120, 160, 3)
+    image_marked = mark_image(image, angle, throttle, mode)
+    # print(image_marked[:20])
+    # print(image_marked.shape)  # (120, 160, 3)
 
     # show movie:
+    video_img_arr = image_marked / 255
+    video_img_arr = cv2.cvtColor(video_img_arr, cv2.COLOR_BGR2RGB)  # OpenCV uses BGR order
     cv2.imshow('Frame', video_img_arr)
 
     # Press Q on keyboard to  exit
-    if cv2.waitKey(5) & 0xFF == ord('q'):
-        return None     # AttributeError: 'NoneType' object has no attribute 'dtype', exits 1
+    if cv2.waitKey(100) & 0xFF == ord('q'):
+        return None  # AttributeError: 'NoneType' object has no attribute 'dtype', exits 1
 
-    return video_img_arr * 255  # image  # returns None or a 8-bit RGB array (120, 160, 3) required by mpy.VideoClip()
+    return image_marked  # image  # returns None or a 8-bit RGB array (120, 160, 3) required by mpy.VideoClip()
 
 
 tub = Tub(path=path, inputs=inputs, types=types)
