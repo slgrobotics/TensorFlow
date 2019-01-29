@@ -5,6 +5,7 @@ import shutil
 import argparse
 
 import numpy as np
+import random
 import cv2
 from PIL import Image, ImageDraw, ImageFont
 
@@ -37,11 +38,15 @@ def get_recorded_frame(t):
     rec = tub.get_record(iRec)
 
     image = rec[inputs[0]]  # a 8-bit RGB array, shape: (120, 160, 3)
-    angle = rec[inputs[1]]
-    throttle = rec[inputs[2]]
-    mode = rec[inputs[3]]
+    angle = rec[inputs[1]]  # range -1.0...1.0
+    throttle = rec[inputs[2]]  # range 0...1.0
+    mode = rec[inputs[3]]  # 'user'
 
     return image, angle, throttle, mode  # returns a tuple
+
+
+def clamp(n, minn, maxn):
+    return min(max(n, minn), maxn)
 
 
 def mark_image(image, angle, throttle, mode):
@@ -53,15 +58,30 @@ def mark_image(image, angle, throttle, mode):
     img_height = image.shape[0]
 
     line_width = 5  # of the elements in the large image
-    color_fg = (0, 127, 0)
+    color_angle = (0, 255, 0)
+    color_throttle = (255, 0, 0)
 
-    pdraw.text((15, 10), "{:.3f}".format(angle), font=ImageFont.truetype("arial", 16))
-    pdraw.text((img_width - 60, 10), "{:.3f}".format(throttle), font=ImageFont.truetype("arial", 16))
+    # throttle = random.random()      # 0...1
 
-    x = 10 if angle < 0 else img_width - 10
-    if angle == 0:
-        x = img_width / 2
-    pdraw.line((x, 10, img_width / 2, img_height - 10), fill=color_fg, width=line_width)
+    pdraw.text((15, 10), "{:.3f}".format(angle), color_angle, font=ImageFont.truetype("arial", 16))
+    pdraw.text((img_width - 60, 10), "{:.3f}".format(throttle), color_throttle, font=ImageFont.truetype("arial", 16))
+
+    angle = clamp(angle, -1, 1)  # should be within the range anyway
+    margin_top = 30
+    margin_bottom = 10
+    l = img_height - (margin_top + margin_bottom)
+    dx = l * np.sin(angle)
+    x = img_width / 2 + dx
+
+    pdraw.line((x, margin_top, img_width / 2, img_height - margin_bottom), fill=color_angle, width=line_width)
+
+    throttle = clamp(throttle, -1, 1)  # should be within the range anyway
+
+    l = throttle * (img_height - (margin_top + margin_bottom))
+    x = img_width - 5
+    y = img_height - margin_bottom - l
+
+    pdraw.line((x, y, x, img_height - margin_bottom), fill=color_throttle, width=line_width)
 
     return np.asarray(video_img, dtype=np.float32)
 
