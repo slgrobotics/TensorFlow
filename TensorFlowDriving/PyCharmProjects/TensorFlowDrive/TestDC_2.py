@@ -7,11 +7,12 @@ import argparse
 import numpy as np
 import random
 import cv2
-from PIL import Image, ImageDraw, ImageFont
 
 import moviepy.editor as mpy
 
 from libDonkeyCar.datastore import Tub
+
+from libPlotter.testVideoHelper import TestVideoHelper
 
 path = 'C:\\Projects\\Robotics\\DonkeyCar\\DonkeySimWindows\\log'  # Sim or actual drive log location
 DRIVE_LOOP_HZ = 10
@@ -45,47 +46,6 @@ def get_recorded_frame(t):
     return image, angle, throttle, mode  # returns a tuple
 
 
-def clamp(n, minn, maxn):
-    return min(max(n, minn), maxn)
-
-
-def mark_image(image, angle, throttle, mode):
-    # make a frame with markings to show on video:
-    video_img = Image.fromarray(image)
-    pdraw = ImageDraw.Draw(video_img)
-
-    img_width = image.shape[1]
-    img_height = image.shape[0]
-
-    line_width = 5  # of the elements in the large image
-    color_angle = (0, 255, 0)
-    color_throttle = (255, 0, 0)
-
-    # throttle = random.random()      # 0...1
-
-    pdraw.text((15, 10), "{:.3f}".format(angle), color_angle, font=ImageFont.truetype("arial", 16))
-    pdraw.text((img_width - 60, 10), "{:.3f}".format(throttle), color_throttle, font=ImageFont.truetype("arial", 16))
-
-    angle = clamp(angle, -1, 1)  # should be within the range anyway
-    margin_top = 30
-    margin_bottom = 10
-    l = img_height - (margin_top + margin_bottom)
-    dx = l * np.sin(angle)
-    x = img_width / 2 + dx
-
-    pdraw.line((x, margin_top, img_width / 2, img_height - margin_bottom), fill=color_angle, width=line_width)
-
-    throttle = clamp(throttle, -1, 1)  # should be within the range anyway
-
-    l = throttle * (img_height - (margin_top + margin_bottom))
-    x = img_width - 5
-    y = img_height - margin_bottom - l
-
-    pdraw.line((x, y, x, img_height - margin_bottom), fill=color_throttle, width=line_width)
-
-    return np.asarray(video_img, dtype=np.float32)
-
-
 # This is called from the VideoClip as it references a time.
 def make_frame(t):
     image, angle, throttle, mode = get_recorded_frame(t)
@@ -93,17 +53,13 @@ def make_frame(t):
     # print(image.shape)  # (120, 160, 3)
     # print('angle=', angle, 'throttle=', throttle, 'mode=', mode)
 
-    image_marked = mark_image(image, angle, throttle, mode)
+    image_marked = TestVideoHelper.mark_image(image, angle, throttle, mode)
     # print(image_marked[:20])
     # print(image_marked.shape)  # (120, 160, 3)
 
-    # show movie:
-    video_img_arr = image_marked / 255
-    video_img_arr = cv2.cvtColor(video_img_arr, cv2.COLOR_BGR2RGB)  # OpenCV uses BGR order
-    cv2.imshow('Frame', video_img_arr)
-
-    # Press Q on keyboard to  exit
-    if cv2.waitKey(100) & 0xFF == ord('q'):
+    # show movie frame:
+    if(TestVideoHelper.showVideoFrame(image_marked / 255) == False):
+        # Pressed Q on keyboard to exit
         return None  # AttributeError: 'NoneType' object has no attribute 'dtype', exits 1
 
     return image_marked  # image  # returns None or a 8-bit RGB array (120, 160, 3) required by mpy.VideoClip()
