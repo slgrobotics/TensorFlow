@@ -50,13 +50,13 @@ class TestVideoHelper(object) :
 
 
     @staticmethod
-    def showVideoFrame(image):
+    def showVideoFrame(image, waitms=25):
         # show one movie frame
         video_img_arr = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # OpenCV uses BGR order
         cv2.imshow('Frame', video_img_arr)
 
         # Press Q on keyboard to  exit - pass that to the caller:
-        if cv2.waitKey(100) & 0xFF == ord('q'):
+        if cv2.waitKey(waitms) & 0xFF == ord('q'):
             return False  # AttributeError: 'NoneType' object has no attribute 'dtype', exits 1
 
         return True

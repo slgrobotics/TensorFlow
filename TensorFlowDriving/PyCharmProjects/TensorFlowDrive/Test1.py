@@ -56,9 +56,11 @@ train_images, val_images, train_labels, val_labels = \
 
 print('...making test_images...')
 
-test_images, test_labels = TestImageGen.all_images(1000, size_th)
+# test_images, test_labels = TestImageGen.all_images(1000, size_th)
+train_images, test_images, train_labels, test_labels = \
+    sk.train_test_split(train_images, train_labels,test_size=0.2, random_state = 42)
 
-train_images.shape
+print('train_images.shape:', train_images.shape)
 
 for i in range(0, 5):
     plt.figure()
