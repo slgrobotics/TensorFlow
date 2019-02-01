@@ -31,6 +31,7 @@ print(platform.python_version())
 # In[3]:
 
 run_tag = "conv11"
+size_th = 28 # 64 # 28 # of the scaled down "thumbnail" that is passed to tensorflow model, e.x. 28
 
 EPOCHS = 3
 
@@ -38,7 +39,7 @@ filename = 'train_images.npz'
 
 if(os.path.isfile(filename) != True):
     print('...no file - making train_images...')
-    train_images, train_labels = TestImageGen.all_images(10000)
+    train_images, train_labels = TestImageGen.all_images(10000, size_th)
     print('...saving to file: ', filename)
     np.savez(filename, train_images, train_labels)
 else:
@@ -49,19 +50,19 @@ else:
 
 print('...making val_images...')
 
-# val_images, val_labels = TestImageGen.all_images(1000)
+# val_images, val_labels = TestImageGen.all_images(1000, size_th)
 train_images, val_images, train_labels, val_labels = \
     sk.train_test_split(train_images, train_labels,test_size=0.2, random_state = 42)
 
 print('...making test_images...')
 
-test_images, test_labels = TestImageGen.all_images(1000)
+test_images, test_labels = TestImageGen.all_images(1000, size_th)
 
 train_images.shape
 
 for i in range(0, 5):
     plt.figure()
-    plt.imshow(train_images[i].reshape((TestImageGen.size_th, TestImageGen.size_th)))  # train_images[0])
+    plt.imshow(train_images[i].reshape((size_th, size_th)))  # train_images[0])
     plt.colorbar()
     plt.grid(False)
 
@@ -73,7 +74,7 @@ for i in range(25):
     plt.xticks([])
     plt.yticks([])
     plt.grid(False)
-    plt.imshow(train_images[i].reshape((TestImageGen.size_th, TestImageGen.size_th)), cmap=plt.cm.binary)
+    plt.imshow(train_images[i].reshape((size_th, size_th)), cmap=plt.cm.binary)
     plt.xlabel(TestImageGen.class_names[train_labels[i]])
 
 # model = keras.Sequential([
@@ -85,7 +86,7 @@ for i in range(25):
 
 model = keras.Sequential([
     keras.layers.Conv2D(32, kernel_size=(5, 5), strides=(1, 1), activation='relu',
-                        input_shape=(TestImageGen.size_th, TestImageGen.size_th, 1),
+                        input_shape=(size_th, size_th, 1),
                         name='Conv2D_first'),
     keras.layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2), name='Pooler_first'),
     keras.layers.Dropout(0.1, noise_shape=None, seed=None, name='Dropper_one'),

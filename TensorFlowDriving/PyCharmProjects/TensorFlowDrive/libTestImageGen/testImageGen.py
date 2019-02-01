@@ -28,8 +28,6 @@ class_names_dictionary = {
 
 class TestImageGen(object):
 
-    size_th = 32  # 32 # 64 # 28 # of the scaled down "thumbnail" that is passed to tensorflow model, e.x. 28
-
     class_names = ['left', 'left-corr', 'straight', 'right-corr', 'right']
 
     num_classes = len(class_names)
@@ -102,8 +100,8 @@ class TestImageGen(object):
 
     # converts image to a (size_th x size_th) numpy array, suitable for TensorFlow input
     @staticmethod
-    def to_image_arr(img):
-        img.thumbnail((TestImageGen.size_th, TestImageGen.size_th))
+    def to_image_arr(img, size_th):
+        img.thumbnail((size_th, size_th))
         img = img.convert("RGB")
         # img.show()
         img_arr = np.asarray(img, dtype=np.float32) / 255
@@ -119,12 +117,13 @@ class TestImageGen(object):
     # creates train or test set - images (as size_th x size_th numpy arrays) and random labels
     # see https://www.tensorflow.org/tutorials/keras/basic_classification
     @staticmethod
-    def all_images(num_images):
+    def all_images(num_images, size_th = 32):
+        # size_th = 32 # 64 # 28 # of the scaled down "thumbnail" that is passed to tensorflow model, e.x. 28
         np.random.seed(420976534)
         labels = np.random.choice([0, 1, 2, 3, 4], size=num_images)
-        images = np.empty(shape=(num_images, TestImageGen.size_th, TestImageGen.size_th, 1), dtype=np.float32)
+        images = np.empty(shape=(num_images, size_th, size_th, 1), dtype=np.float32)
         for i in range(0, num_images):
             img = TestImageGen.make_image(labels[i])
-            img_arr = TestImageGen.to_image_arr(img)
+            img_arr = TestImageGen.to_image_arr(img, size_th)
             images[i] = img_arr
         return images, labels  # images.shape (num_images, size_th, size_th, 1)

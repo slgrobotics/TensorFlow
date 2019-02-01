@@ -12,7 +12,8 @@ class TestResultsPlotter(object) :
         plt.xticks([])
         plt.yticks([])
 
-        plt.imshow(img.reshape((TestImageGen.size_th, TestImageGen.size_th)), cmap=plt.cm.binary)
+        size_th = img.shape[0]
+        plt.imshow(img.reshape((size_th, size_th)), cmap=plt.cm.binary)
 
         predicted_label = np.argmax(predictions_array)
         if predicted_label == true_label:
