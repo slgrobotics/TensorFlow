@@ -47,6 +47,8 @@ else:
     npzfile = np.load(filename)
     train_images = npzfile['arr_0']
     train_labels = npzfile['arr_1']
+    # angles = npzfile['arr_2']
+    # throttles = npzfile['arr_3']
 
 print('...making val_images...')
 

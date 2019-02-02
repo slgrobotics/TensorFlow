@@ -75,6 +75,8 @@ def make_npz(listnpz, outnpz):
 
     images = []
     labels = []
+    angles = []
+    throttles = []
 
     class_names = ['left', 'left-corr', 'straight', 'right-corr', 'right']
 
@@ -84,9 +86,16 @@ def make_npz(listnpz, outnpz):
         angle = item[1]
         throttle = item[2]
 
+        angles.append(angle)
+        throttles.append(throttle)
+
         # print(image.shape, angle, throttle)  # (120, 160, 3) 0.0035258643329143524 0.30000001192092896
 
         video_img = Image.fromarray(image)
+        img_w = video_img.width
+        img_h = video_img.height
+        video_img = video_img.crop((0,img_h/2,img_w,img_h))
+
         thumb_img = video_img.resize((size_th, size_th)).convert(mode='L')  # to grayscale
         thumb_arr = np.asarray(thumb_img, dtype=np.float32)
 
@@ -113,13 +122,15 @@ def make_npz(listnpz, outnpz):
 
     images_arr = np.asarray(images)
     labels_arr = np.asarray(labels)
+    angles_arr = np.asarray(angles)
+    throttles_arr = np.asarray(throttles)
 
     print(images_arr.shape)
     print(labels_arr.shape)
     print(labels_arr[:10])
 
     print('...saving to file:', outnpz)
-    np.savez(outnpz, images_arr, labels_arr)
+    np.savez(outnpz, images_arr, labels_arr, angles_arr, throttles_arr)
 
     return
 
