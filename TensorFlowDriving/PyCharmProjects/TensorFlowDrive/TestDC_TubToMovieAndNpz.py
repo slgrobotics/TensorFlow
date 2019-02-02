@@ -56,7 +56,7 @@ def make_frame(t):
     # print(image.shape)  # (120, 160, 3)
     # print('angle=', angle, 'throttle=', throttle, 'mode=', mode)
 
-    image_marked = TestVideoHelper.mark_image(image, angle, throttle, mode)
+    image_marked = TestVideoHelper.mark_image(iRec, image, angle, throttle, mode)
     # print(image_marked[:20])
     # print(image_marked.shape)  # (120, 160, 3)
 

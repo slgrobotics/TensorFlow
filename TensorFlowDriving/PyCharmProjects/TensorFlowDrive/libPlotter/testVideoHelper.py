@@ -10,7 +10,7 @@ class TestVideoHelper(object) :
 
 
     @staticmethod
-    def mark_image(image, angle, throttle, mode):
+    def mark_image(iRec, image, angle, throttle, mode):
         # make a frame with markings to show on video:
         video_img = Image.fromarray(image)
         pdraw = ImageDraw.Draw(video_img)
@@ -21,11 +21,13 @@ class TestVideoHelper(object) :
         line_width = 5  # of the elements in the large image
         color_angle = (0, 255, 0)
         color_throttle = (255, 0, 0)
+        color_counter = (255, 255, 255)
 
         # throttle = random.random()      # 0...1
 
         pdraw.text((15, 10), "{:.3f}".format(angle), color_angle, font=ImageFont.truetype("arial", 16))
         pdraw.text((img_width - 60, 10), "{:.3f}".format(throttle), color_throttle, font=ImageFont.truetype("arial", 16))
+        pdraw.text((15, img_height-15), "{:d}".format(iRec), color_counter, font=ImageFont.truetype("arial", 12))
 
         # draw a line in the middle, tilted to show wheels angle:
         angle = TestVideoHelper.clamp(angle, -1, 1)  # should be within the range anyway

@@ -53,12 +53,12 @@ def make_frame(t):
     # print(image.shape)  # (120, 160, 3)
     # print('angle=', angle, 'throttle=', throttle, 'mode=', mode)
 
-    image_marked = TestVideoHelper.mark_image(image, angle, throttle, mode)
+    image_marked = TestVideoHelper.mark_image(iRec, image, angle, throttle, mode)
     # print(image_marked[:20])
     # print(image_marked.shape)  # (120, 160, 3)
 
     # show movie frame:
-    if(TestVideoHelper.showVideoFrame(image_marked / 255) == False):
+    if(TestVideoHelper.showVideoFrame(image_marked / 255, waitms=10) == False):
         # Pressed Q on keyboard to exit
         return None  # AttributeError: 'NoneType' object has no attribute 'dtype', exits 1
 
