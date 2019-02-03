@@ -11,7 +11,7 @@ import sklearn.model_selection as sk        # https://scikit-learn.org/stable/
 import os
 
 from libTestImageGen.testImageGen import TestImageGen
-from libPlotter.testResultsPlotter import TestResultsPlotter
+from libPlotter.testResultsPlotter2 import TestResultsPlotter2
 from libPlotter.testVideoHelper import TestVideoHelper
 
 print(tf.__version__)
@@ -68,48 +68,11 @@ print('train_images.shape:', train_images.shape)
 
 print('train_angles:', train_angles[:100])
 
-num_rows = 50
-num_cols = 8
-line_width = 1  # of the elements in the large image
-color_angle = 0
-#color_throttle = 255
-
-num_images = num_rows * num_cols
-fig = plt.figure(figsize=(2 * num_cols, 2 * num_rows))
-for i in range(num_images):
-    plt.subplot(num_rows, num_cols, i + 1)
-    plt.xticks([])
-    plt.yticks([])
-    plt.grid(False)
-
-    angle = train_angles[i]
-
-    image = train_images[i].reshape((size_th, size_th))
-    img_width = image.shape[1]
-    img_height = image.shape[0]
-
-    video_img = Image.fromarray(image)
-    pdraw = ImageDraw.Draw(video_img)
-
-    # pdraw.text((1, 0), "{:.3f}".format(angle), color_angle, font=ImageFont.truetype("arial", 9))
-
-    # draw a line in the middle, tilted to show wheels angle:
-    angle = TestVideoHelper.clamp(angle, -1, 1)  # should be within the range anyway
-    margin_top = 3
-    margin_bottom = 1
-    l = img_height - (margin_top + margin_bottom)
-    dx = l * np.sin(angle)
-    x = img_width / 2 + dx
-
-    pdraw.line((x, margin_top, img_width / 2, img_height - margin_bottom),
-               fill=color_angle, width=line_width)
-
-    plt.imshow(np.asarray(video_img, dtype=np.float32), cmap=plt.cm.binary)
-    plt.xlabel("{:.3f}".format(angle))
-
 out_filename = run_tag + '_befr_out.png'
 
-fig.savefig(out_filename, bbox_inches='tight')
+print('...plotting to file: ', out_filename)
+
+TestResultsPlotter2.plotBefore(out_filename, train_images, train_angles, train_angles)
 
 model = keras.Sequential([
     keras.layers.Conv2D(32, kernel_size=(5, 5), strides=(1, 1), activation='relu',
@@ -181,6 +144,6 @@ print('...plotting to file: ', out_filename)
 
 # see folder C:\Users\sergei\PycharmProjects\TensorFlowDrive
 
-TestResultsPlotter.plotResults(out_filename, predictions, test_angles, test_images)
+TestResultsPlotter2.plotResults(out_filename, predictions, test_images, test_angles, test_angles)
 
 print('OK: finished')

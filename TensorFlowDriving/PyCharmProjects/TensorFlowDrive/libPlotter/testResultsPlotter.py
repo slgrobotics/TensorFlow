@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 
 from libTestImageGen.testImageGen import TestImageGen
 
+#
+# to plot results of a simulated dataset, with labels taken from TestImageGen
+#
 class TestResultsPlotter(object) :
 
     @staticmethod
