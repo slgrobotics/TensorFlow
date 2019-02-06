@@ -15,7 +15,8 @@ from libDonkeyCar.datastore import Tub
 
 from libPlotter.testVideoHelper import TestVideoHelper
 
-path = 'C:\\Projects\\Robotics\\DonkeyCar\\DonkeySimWindows\\log'  # Sim or actual drive log location
+#path = 'C:\\Projects\\Robotics\\DonkeyCar\\DonkeySimWindows\\log'  # Sim or actual drive log location
+path = 'C:\\Projects\\Robotics\\DonkeyCar\\DonkeySimWindows\\logsim'  # Sim drive log location
 DRIVE_LOOP_HZ = 10
 out = 'movie.mp4'
 outnpz = 'train_images.npz'
@@ -94,7 +95,7 @@ def make_npz(listnpz, outnpz):
         video_img = Image.fromarray(image)
         img_w = video_img.width
         img_h = video_img.height
-        video_img = video_img.crop((0,img_h/2,img_w,img_h))
+        #video_img = video_img.crop((0,img_h/2,img_w,img_h))
 
         thumb_img = video_img.resize((size_th, size_th)).convert(mode='L')  # to grayscale
         thumb_arr = np.asarray(thumb_img, dtype=np.float32)

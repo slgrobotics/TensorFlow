@@ -37,7 +37,7 @@ class TestResultsPlotter2(object) :
 
     @staticmethod
     def plot_image(i, predictions_array, img, test_angles, test_throttles):
-        predictions_array, true_angle, img = predictions_array[i], test_angles[i], img[i]
+        predictions_array, img, true_angle = predictions_array[i], img[i], test_angles[i]
         plt.grid(False)
         plt.xticks([])
         plt.yticks([])
@@ -46,8 +46,10 @@ class TestResultsPlotter2(object) :
 
         predicted_angle = np.argmax(predictions_array)
 
-        video_img = TestResultsPlotter2.mark_image(img.reshape((size_th, size_th)), true_angle)
-        video_img = TestResultsPlotter2.mark_image(video_img, predicted_angle, color_angle=255)
+        video_img = TestResultsPlotter2.mark_image(img.reshape((size_th, size_th)),
+                                                   true_angle, color_angle=960)
+        video_img = TestResultsPlotter2.mark_image(video_img,
+                                                   predicted_angle, color_angle=180)
         plt.imshow(video_img, cmap=plt.cm.binary)
 
         if predicted_angle == true_angle:
@@ -77,7 +79,7 @@ class TestResultsPlotter2(object) :
         num_rows = 50
         num_cols = 8
         line_width = 1  # of the elements in the large image
-        color_angle = 0
+        color_angle = 96
         # color_throttle = 255
 
         num_images = num_rows * num_cols
